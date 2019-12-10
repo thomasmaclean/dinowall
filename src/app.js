@@ -14,6 +14,8 @@
  * limitations under the license.
  */
 
+import Dino from './dino.js';
+
 var anypixel = require('anypixel');
 var ctx = anypixel.canvas.getContext2D();
 const ObstacleManager = require('./obstacle_manager');
@@ -47,12 +49,14 @@ const horizonImage = getHorizonImage();
 const dinosaurImage = getDinosaurImage();
 
 const obstacleManager = new ObstacleManager();
+const dinos = [new Dino(ctx)];
 
 /**
  * Listen for onButtonDown events and draw a 2x2 rectangle at the event site
  */
 document.addEventListener('onButtonDown', function (event) {
   obstacleManager.addDefaultObstacle(new Obstacle(canvasXToPrimaryLayerX(event.detail.x), event.detail.y));
+  dinos[0].jump();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -63,7 +67,7 @@ function drawHorizon(elapsedTimeInFrame) {
   updateHorizonLocation(elapsedTimeInFrame);
   ctx.drawImage(horizonImage, horizonLocation, INC_H - horizonImage.height);
   ctx.drawImage(horizonImage, primaryLayerXToCanvasX(horizonImage.width),
-      INC_H - horizonImage.height);
+    INC_H - horizonImage.height);
 }
 
 function updateHorizonLocation(elapsedTimeInFrame) {
@@ -73,21 +77,21 @@ function updateHorizonLocation(elapsedTimeInFrame) {
 
 function drawDinosaur(dinosaur) {
   ctx.drawImage(dinosaurImage, 0, 0, DINOSAUR_W, DINOSAUR_H,
-      dinosaur.x, dinosaur.y, DINOSAUR_W, DINOSAUR_H);
+    dinosaur.x, dinosaur.y, DINOSAUR_W, DINOSAUR_H);
 }
 
-function drawObstacles(obstacleManager){
+function drawObstacles(obstacleManager) {
   ctx.fillStyle = colors[1];
-  for(obstacle of obstacleManager.getDefaultObstacles()){
+  for (obstacle of obstacleManager.getDefaultObstacles()) {
     ctx.fillRect(primaryLayerXToCanvasX(obstacle.x), obstacle.y, obstacle.width, obstacle.height);
   }
 }
 
-function primaryLayerXToCanvasX(x){
+function primaryLayerXToCanvasX(x) {
   x + horizonLocation;
 }
 
-function canvasXToPrimaryLayerX(x){
+function canvasXToPrimaryLayerX(x) {
   x - horizonLocation;
 }
 
@@ -100,6 +104,7 @@ function update() {
   drawDinosaur(dinosaur);
   drawObstacles(obstacleManager);
   lastFrame = Date.now();
+  dinos.forEach(dino => dino.update());
 
   requestAnimationFrame(update);
 }
