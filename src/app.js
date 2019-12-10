@@ -14,7 +14,7 @@
  * limitations under the license.
  */
 
-import Dino from './dino.js';
+const Dino = require('./dino.js');
 
 var anypixel = require('anypixel');
 var ctx = anypixel.canvas.getContext2D();
@@ -101,7 +101,6 @@ function update() {
 
   const elapsedTimeInFrame = (Date.now() - lastFrame) / 1000;
   drawHorizon(elapsedTimeInFrame);
-  drawDinosaur(dinosaur);
   drawObstacles(obstacleManager);
   lastFrame = Date.now();
   dinos.forEach(dino => dino.update());
