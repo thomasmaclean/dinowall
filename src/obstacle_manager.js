@@ -1,9 +1,16 @@
+const Obstacle = require('./obstacle');
 
-
-export class ObstacleManager{
-  growingObstacles = [];
-  fallingObstacles = [];
+module.exports =  class ObstacleManager{
+  defaultObstacles = [];
 
   constructor(){
+  }
+
+  addDefaultObstacle(obstacle){
+    this.defaultObstacles.push(obstacle);
+  }
+
+  getDefaultObstacles(){
+    return this.defaultObstacles;
   }
 }

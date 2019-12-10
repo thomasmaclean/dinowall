@@ -16,6 +16,8 @@
 
 var anypixel = require('anypixel');
 var ctx = anypixel.canvas.getContext2D();
+const ObstacleManager = require('./obstacle_manager');
+const Obstacle = require('./obstacle');
 
 const INC_W = anypixel.config.width;
 const INC_H = anypixel.config.height;
@@ -44,11 +46,13 @@ let lastFrame = Date.now();
 const horizonImage = getHorizonImage();
 const dinosaurImage = getDinosaurImage();
 
+const obstacleManager = new ObstacleManager();
+
 /**
  * Listen for onButtonDown events and draw a 2x2 rectangle at the event site
  */
 document.addEventListener('onButtonDown', function (event) {
-  dinosaur.x++;
+  obstacleManager.addDefaultObstacle(new Obstacle(canvasXToPrimaryLayerX(event.detail.x), event.detail.y));
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -58,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function drawHorizon(elapsedTimeInFrame) {
   updateHorizonLocation(elapsedTimeInFrame);
   ctx.drawImage(horizonImage, horizonLocation, INC_H - horizonImage.height);
-  ctx.drawImage(horizonImage, horizonLocation + horizonImage.width,
+  ctx.drawImage(horizonImage, primaryLayerXToCanvasX(horizonImage.width),
       INC_H - horizonImage.height);
 }
 
@@ -68,9 +72,23 @@ function updateHorizonLocation(elapsedTimeInFrame) {
 }
 
 function drawDinosaur(dinosaur) {
-  ctx.fillStyle = colors[1];
   ctx.drawImage(dinosaurImage, 0, 0, DINOSAUR_W, DINOSAUR_H,
       dinosaur.x, dinosaur.y, DINOSAUR_W, DINOSAUR_H);
+}
+
+function drawObstacles(obstacleManager){
+  ctx.fillStyle = colors[1];
+  for(obstacle of obstacleManager.getDefaultObstacles()){
+    ctx.fillRect(primaryLayerXToCanvasX(obstacle.x), obstacle.y, obstacle.width, obstacle.height);
+  }
+}
+
+function primaryLayerXToCanvasX(x){
+  x + horizonLocation;
+}
+
+function canvasXToPrimaryLayerX(x){
+  x - horizonLocation;
 }
 
 function update() {
@@ -80,6 +98,7 @@ function update() {
   const elapsedTimeInFrame = (Date.now() - lastFrame) / 1000;
   drawHorizon(elapsedTimeInFrame);
   drawDinosaur(dinosaur);
+  drawObstacles(obstacleManager);
   lastFrame = Date.now();
 
   requestAnimationFrame(update);

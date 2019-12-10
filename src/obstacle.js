@@ -1,7 +1,8 @@
-export class Obstacle {
-  constructor(x, y, size = 1) {
+module.exports =  class Obstacle {
+  constructor(x, y, width = 2, height = 4) {
     this.x = x;
     this.y = y;
-    this.size = size;
+    this.width = width;
+    this.height = height;
   }
 }
