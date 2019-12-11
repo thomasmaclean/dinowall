@@ -49,14 +49,20 @@ const horizonImage = getHorizonImage();
 const dinosaurImage = getDinosaurImage();
 
 const obstacleManager = new ObstacleManager();
-const dinos = [new Dino(ctx)];
+const dinos = [new Dino(ctx), null, null, null, null, null];
 
 /**
  * Listen for onButtonDown events and draw a 2x2 rectangle at the event site
  */
 document.addEventListener('onButtonDown', function (event) {
   obstacleManager.addDefaultObstacle(new Obstacle(canvasXToPrimaryLayerX(event.detail.x), event.detail.y));
-  dinos[0].jump();
+  const randomColor = '#' + Math.random().toString(16).slice(2, 3);
+  const region = Math.min(Math.floor(event.detail.x / DINOSAUR_H), 5);
+  if (!dinos[region] || dinos[region] === 'DEAD') {
+    dinos[region] = new Dino(ctx, region * DINOSAUR_H + 2);
+
+  }
+  dinos[region].jump();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -103,7 +109,7 @@ function update() {
   drawHorizon(elapsedTimeInFrame);
   drawObstacles(obstacleManager);
   lastFrame = Date.now();
-  dinos.forEach(dino => dino.update());
+  dinos.forEach(dino => dino && dino.update());
 
   requestAnimationFrame(update);
 }

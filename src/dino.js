@@ -1,5 +1,7 @@
 const RUNNING = 'RUNNING';
 const JUMPING = 'JUMPING';
+const DYING = 'DYING';
+const DEAD = 'DEAD';
 
 const DEFAULT_LOCATION = 2;
 const DEFAULT_COLOR = '#FFF';
@@ -15,6 +17,7 @@ const FRAME_STANDING = 0;
 const FRAME_BLINKING = 1;
 const FRAME_LEFT_LEG = 2;
 const FRAME_RIGHT_LEG = 3;
+const FRAME_DEAD = 3;
 
 const COUNTER_LIMIT = 60;
 const WALK_CYCLE_FR = 10; // ideally divides evenly into COUNTER_LIMIT
@@ -42,7 +45,14 @@ function Dino(ctx, x = DEFAULT_LOCATION, color = DEFAULT_COLOR) {
         }
     }
 
+    this.kill = () => {
+        this.state = DYING;
+        this.frame = FRAME_DEAD;
+    }
+
     this.update = () => {
+        if (this.state === DEAD) return;
+
         this.counter++;
 
         if (this.counter > COUNTER_LIMIT) {
@@ -67,7 +77,13 @@ function Dino(ctx, x = DEFAULT_LOCATION, color = DEFAULT_COLOR) {
             }
         }
 
-        ctx.fillStyle = this.color;
+        if (this.state === DYING) {
+            this.x--;
+            if (this.x < 0 - this.w) {
+                this.state === DEAD;
+            }
+        }
+
         ctx.drawImage(this.image, this.frame * this.w, 0, this.w, this.h,
             this.x, this.y, this.w, this.h);
     }
